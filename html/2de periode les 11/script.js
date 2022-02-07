@@ -7,58 +7,52 @@ const height = window.innerHeight;
 canvas.width = width;
 canvas.height = height;
 
-let bg = new GraphBackGround();
-let A, B, dx, dy, line, C, D, points;
+let graph, A, B, l, C, m, D, n;
 
-A = new Point(200, 200, 20, "red", true);
-B = new Point(500, 300, 20, "blue", true);
-C = new Point(0, 0, 10, "white", false);
-D = new Point(0, 0, 10, "white", false);
+graph = new GraphBackGround();
+A = new Point(200, 200, 15, "white", true);
+B = new Point(500, 100, 15, "white", true);
+C = new Point(300, 300, 14, "yellow", true);
+D = new Point(400, 300, 14, "red", true);
+l = new LinearFunction(0, 0);
+m = new LinearFunction(0, 0);
+n = new LinearFunction(0, 0);
 
-points = [];
-for (let i = 0; i < 100; i++) {
-    let E = new Point(Math.random() * width, Math.random() * height, 5, "black", false);
-    points.push(E);
-}
-
-line = new LinearFunction(0, 0)
 animate();
 
 function animate() {
     requestAnimationFrame(animate);
-    context.clearRect(0, 0, width, height);
-    bg.draw();
+    context.clearRect(0, 0, width, height)
+    graph.draw();
+    //
+    l.slope = (B.y - A.y) / (B.x - A.x);
+    l.intercept = A.y - l.slope * A.x;
+    drawLine(l, "blue");
+    //
+    m.slope = l.slope;
+    m.intercept = C.y - m.slope * C.x;
+    drawLine(m, "midnightblue");
+    //
+    n.slope = -1 / l.slope;
+    n.intercept = D.y - n.slope * D.x;
+    drawLine(n, "red");
+
+
     A.draw();
     B.draw();
-
-    dx = B.x - A.x;
-    dy = B.y - A.y;
-
-    line.slope = dy / dx;
-    line.intercept = A.y - line.slope * A.x;
-
-    C.x = 0;
-    C.y = line.y(0);
     C.draw();
-
-    D.x = width;
-    D.y = line.y(width);
     D.draw();
 
+
+
+}
+
+function drawLine(line, color) {
     context.beginPath();
-    context.lineStyle = "4";
-    context.moveTo(C.x, C.y);
-    context.lineTo(D.x, D.y);
+    context.lineWidth = "4";
+    context.strokeStyle = color;
+    context.moveTo(0, line.y(0));
+    context.lineTo(width, line.y(width));
     context.closePath();
     context.stroke();
-
-    points.map((p) => {
-        if (p.y < p.x * line.slope + line.intercept) {
-            p.color = "red"
-        } else {
-            p.color = "green"
-        }
-        p.draw();
-    })
-
 }
