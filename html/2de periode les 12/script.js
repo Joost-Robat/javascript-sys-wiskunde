@@ -7,52 +7,50 @@ const height = window.innerHeight;
 canvas.width = width;
 canvas.height = height;
 
-let graph, A, B, l, C, m, D, n;
+let graph,A,B,C,S,l,m;
 
 graph = new GraphBackGround();
-A = new Point(200, 200, 15, "white", true);
-B = new Point(500, 100, 15, "white", true);
-C = new Point(300, 300, 14, "yellow", true);
-D = new Point(400, 300, 14, "red", true);
-l = new LinearFunction(0, 0);
-m = new LinearFunction(0, 0);
-n = new LinearFunction(0, 0);
+A = new Point(300,300,15,"rgba(255,0,0,0.3)",true);
+B = new Point(500,200,15,"rgba(255,0,0,0.3)",true);
+C = new Point(400,400,15,"rgba(0,255,0,0.3)",true);
+S = new Point(0,0,10,"white");
 
-animate();
+// y = slope * x + intercept
+l = new LinearFunction(0,0);
+m = new LinearFunction(0,0);
 
-function animate() {
-    requestAnimationFrame(animate);
-    context.clearRect(0, 0, width, height)
+animmate();
+
+function animmate(){
+    requestAnimationFrame(animmate);
+    context.clearRect(0,0,width,height);
     graph.draw();
-    //
-    l.slope = (B.y - A.y) / (B.x - A.x);
-    l.intercept = A.y - l.slope * A.x;
-    drawLine(l, "blue");
-    //
-    m.slope = l.slope;
-    m.intercept = C.y - m.slope * C.x;
-    drawLine(m, "midnightblue");
-    //
-    n.slope = -1 / l.slope;
-    n.intercept = D.y - n.slope * D.x;
-    drawLine(n, "red");
 
+    l.slope =  (B.y - A.y)/(B.x - A.x);
+
+    l.intercept = B.y - l.slope * B.x;
+    drawLine(l,"red");
+
+    //perpendicular line 1
+    m.slope = -1/l.slope;
+    // point C
+    m.intercept = C.y - m.slope * C.x;
+    drawLine(m,"green");
+
+    S.x = (m.intercept - l.intercept)/ (l.slope - m.slope);
+    S.y = l.y(S.x);
 
     A.draw();
     B.draw();
     C.draw();
-    D.draw();
-
-
-
+    S.draw();
 }
-
-function drawLine(line, color) {
+function drawLine(myLine,color){
     context.beginPath();
-    context.lineWidth = "4";
-    context.strokeStyle = color;
-    context.moveTo(0, line.y(0));
-    context.lineTo(width, line.y(width));
+    context.lineWidth = "3";
+    context.strokeStyle = color
+    context.moveTo(0,myLine.y(0));
+    context.lineTo(width,myLine.y(width));
     context.closePath();
     context.stroke();
 }
