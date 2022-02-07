@@ -7,66 +7,87 @@ const height = window.innerHeight;
 canvas.width = width;
 canvas.height = height;
 
-let graph, A, B, C, ab, ac, bc, p_ab, p_ac, p_bc, S;
+let background, A, B, C, ab, ac, bc, mAB, mAC, mBC, pab, pac, pbc, S, dist;
+// background
+background = new GraphBackGround();
 
-graph = new GraphBackGround();
-
-A = new Point(200, 200, "15", "red", true);
-B = new Point(500, 300, "15", "green", true);
-C = new Point(100, 400, "15", "blue", true);
-
-S = new Point(0, 0, "10", "white", false)
+A = new Point(100, 100, "15", "red", true);
+B = new Point(500, 200, "15", "green", true);
+C = new Point(200, 500, "15", "blue", true);
 
 ab = new LinearFunction(0, 0);
 ac = new LinearFunction(0, 0);
 bc = new LinearFunction(0, 0);
+mAB = new Point(0, 0, "7", "black", false);
+mAC = new Point(0, 0, "7", "black", false);
+mBC = new Point(0, 0, "7", "black", false);
+pab = new LinearFunction(0, 0);
+pac = new LinearFunction(0, 0);
+pbc = new LinearFunction(0, 0);
 
-p_ab = new LinearFunction(0, 0);
-p_ac = new LinearFunction(0, 0);
-p_bc = new LinearFunction(0, 0);
+S = new Point(0, 0, "7", "white", false);
 
 animate();
 function animate() {
     requestAnimationFrame(animate);
     context.clearRect(0, 0, width, height);
-    graph.draw();
+    background.draw();
 
-    ab.lineThroughTwoPoints(A, B);
-    ac.lineThroughTwoPoints(A, C);
-    bc.lineThroughTwoPoints(B, C);
+    ab.slope = (B.y - A.y) / (B.x - A.x);
+    ab.intercept = B.y - ab.slope * B.x;
+    ab.draw("rgba(0,0,255,0.4)");
 
-    ab.draw("black");
-    ac.draw("black");
-    bc.draw("black");
+    ac.slope = (C.y - A.y) / (C.x - A.x);
+    ac.intercept = C.y - ac.slope * C.x;
+    ac.draw("rgba(0,0,255,0.4)");
 
-    drawTriangle();
+    bc.slope = (B.y - C.y) / (B.x - C.x);
+    bc.intercept = B.y - bc.slope * B.x;
+    bc.draw("rgba(0,0,255,0.4)");
 
-    p_ab.slope = -1 / ab.slope;
-    p_ab.intercept = C.y - p_ab.slope * C.x;
-    p_ab.draw("blue");
+    mAB.x = (A.x + B.x) / 2; mAB.y = (A.y + B.y) / 2;
+    mAC.x = (A.x + C.x) / 2; mAC.y = (A.y + C.y) / 2;
+    mBC.x = (C.x + B.x) / 2; mBC.y = (C.y + B.y) / 2;
 
-    p_ac.slope = -1 / ac.slope;
-    p_ac.intercept = B.y - p_ac.slope * B.x;
-    p_ac.draw("green");
+    mAB.draw();
+    mAC.draw();
+    mBC.draw();
 
-    p_bc.slope = -1 / bc.slope;
-    p_bc.intercept = A.y - p_bc.slope * A.x;
-    p_bc.draw("red");
+    pab.slope = -1 / (ab.slope);
+    pab.intercept = mAB.y - pab.slope * mAB.x;
 
-    S.x = p_ab.intersection(p_ac).x;
-    S.y = p_ab.intersection(p_ac).y;
+    pac.slope = -1 / (ac.slope);
+    pac.intercept = mAC.y - pac.slope * mAC.x;
 
-    A.draw();
-    B.draw();
-    C.draw();
-    S.draw();
-}
-function drawTriangle() {
+    pbc.slope = -1 / (bc.slope);
+    pbc.intercept = mBC.y - pbc.slope * mBC.x;
+
+    pab.draw("rgba(255,0,0,0.4)");
+    pac.draw("rgba(255,0,0,0.4)");
+    pbc.draw("rgba(255,0,0,0.4)");
+
+    S.x = pab.intersection(pbc).x;
+    S.y = pab.intersection(pbc).y;
+
+    dist = Math.sqrt((A.x - S.x) * (A.x - S.x) + (A.y - S.y) * (A.y - S.y));
+
     context.beginPath();
-    context.fillStyle = "rgba(255,255,0,0.3)";
+    context.fillStyle = "rgba(0,0,255,0.1)";
+    context.arc(S.x, S.y, dist, 0, Math.PI * 2);
+    context.closePath();
+    context.stroke();
+    context.fill();
+
+    context.beginPath();
+    context.fillStyle = "rgba(255,255,0,0.4)";
     context.moveTo(A.x, A.y);
     context.lineTo(B.x, B.y);
     context.lineTo(C.x, C.y);
     context.closePath();
     context.fill();
+
+    S.draw();
+    A.draw();
+    B.draw();
+    C.draw();
 }
